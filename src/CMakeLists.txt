@@ -1,3 +1,11 @@
+# Find DACE library
+find_package(dace 2.0.0 REQUIRED)
+
+if(WIN32)
+    get_target_property(DACEDLL dace::dace LOCATION)
+    file(COPY "${DACEDLL}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+endif(WIN32)
+
 # IDEA library
 FILE(GLOB Sources lib/*.cpp)
 add_library(idea SHARED ${Sources})
