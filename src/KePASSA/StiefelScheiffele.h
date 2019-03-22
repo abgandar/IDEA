@@ -2,9 +2,12 @@
 using namespace std;
 using namespace DACE;
 
+unsigned int funcs = 0;
+
 template <class T>
 AlgebraicVector<T> StiefelScheiffele(AlgebraicVector<T> x, double t)
 {
+    funcs++;
     AlgebraicVector<T> deriv(6);
     AlgebraicVector<T> ap(3);
 

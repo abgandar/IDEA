@@ -1,3 +1,18 @@
+/*
+    ToDo:
+    - Check RK78 step-size control
+    - Integrators:
+      * Taylor (Alex)
+      * Adams family
+      * Everhart
+    - Problems:
+      * elliptic, circular
+      * 3 body (decide on test case)
+    - Measures:
+      * Automate code for order plotting
+      * ...
+*/
+
 #include <cmath>
 #include <iostream>
 #include <fstream>
@@ -5,10 +20,15 @@
 #include <dace/dace.h>
 
 #include "StiefelScheiffele.h"
+#include "VanDerPol.h"
+
 #include "RK4.h"
 #include "RK8.h"
 #include "RK78.h"
 #include "Leapfrog.h"
+#include "Midpoint.h"
+#include "BulirschStoer.h"
+#include "EverhartRadau.h"
 
 using namespace std;
 using namespace DACE;
@@ -23,17 +43,19 @@ int main(void)
     const double eps = 1e-1;
     AlgebraicVector<DA> y0 = x0 + eps * AlgebraicVector<DA>::identity(6);
 
-    double h = 100;
-    double tol = 0.0001;
+    double h = 40;
+    double tol = 0.0;
     double t0 = 0.;
-    double tf = 288.12768941 * 24. * 3600. / 100;
+    double tf = 288.12768941 * 24. * 3600. / 100.0;
 
     // Perform propagations
     AlgebraicVector<double> x(6);
     vector<AlgebraicVector<double>> resx;
 
     cout << endl << "Propagating with 'double'..." << endl;
-    x = RK78(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    x = EverhartRadau(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    //x = BulirschStoer<double, 2>(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    //x = RK4(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
     cout << "  Done!" << endl;
 
     AlgebraicVector<DA> y(6);
@@ -59,6 +81,7 @@ int main(void)
     cout << " x-Error: " << 1e3 * vnorm(x.extract(0,2) - Ref_Sol) << " m" << endl;
     cout << endl;
     cout << "Number of fixed steps expected: " << int((tf-t0)/h)+1 << endl;
+    cout << "Number of function evaluations: " << funcs << endl;
     /*cout << endl;
     cout << " x:  " << y[0] << endl;
     cout << " y:  " << y[1] << endl;
@@ -67,4 +90,36 @@ int main(void)
     cout << " vy: " << y[4] << endl;
     cout << " vz: " << y[5] << endl;
     cout << endl;*/
+
+    return 0;
+}
+
+
+int main_not_so_much(void)
+{
+    // Initial conditions (km, km/s)
+    AlgebraicVector<double> x0 = { 2.0, 0.0 };
+
+    double h = 0.005;
+    double tol = 0.0001;
+    double t0 = 0.;
+    double tf = 0.01;
+
+    // Perform propagations
+    AlgebraicVector<double> x(2);
+    vector<AlgebraicVector<double>> resx;
+
+    cout << endl << "Propagating with 'double'..." << endl;
+    x = BulirschStoer<double, 4>(t0, tf, h, tol, x0, VanDerPol<double>, resx, false);
+//    x = RK78(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    cout << "  Done!" << endl;
+
+    // Print Cartesian state vector at end of integration
+    cout << endl;
+    cout << " x: " << std::setprecision(16) << x[0] << endl;
+    cout << " y: " << std::setprecision(16) << x[1] << endl;
+    cout << endl;
+    cout << "Number of fixed steps expected: " << int((tf-t0)/h)+1 << endl;
+
+    return 0;
 }
