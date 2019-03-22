@@ -43,19 +43,19 @@ int main(void)
     const double eps = 1e-1;
     AlgebraicVector<DA> y0 = x0 + eps * AlgebraicVector<DA>::identity(6);
 
-    double h = 40;
-    double tol = 0.0;
+    double h = 100;
+    double tol = 1e-8;
     double t0 = 0.;
-    double tf = 288.12768941 * 24. * 3600. / 100.0;
+    double tf = 288.12768941 * 24. * 3600.;
 
     // Perform propagations
     AlgebraicVector<double> x(6);
     vector<AlgebraicVector<double>> resx;
 
     cout << endl << "Propagating with 'double'..." << endl;
-    x = EverhartRadau(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    x = EverhartRadauVar(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
     //x = BulirschStoer<double, 2>(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
-    //x = RK4(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    //x = RK8(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
     cout << "  Done!" << endl;
 
     AlgebraicVector<DA> y(6);
@@ -66,8 +66,8 @@ int main(void)
     cout << "  Done!" << endl;
 
     // Reference Position
-    //AlgebraicVector<double> Ref_Sol ({-24219.05011593605201960070788, 227962.10637302200887202306088, 129753.44240008247047344318589});
-    AlgebraicVector<double> Ref_Sol ({-0.006472054691587e5, 2.290183472899976e5, 1.322860577190283e5});
+    AlgebraicVector<double> Ref_Sol ({-24219.05011593605201960070788, 227962.10637302200887202306088, 129753.44240008247047344318589});
+    //AlgebraicVector<double> Ref_Sol ({-0.006472054691587e5, 2.290183472899976e5, 1.322860577190283e5});
 
     // Print Cartesian state vector at end of integration
     cout << endl;
