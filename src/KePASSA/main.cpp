@@ -21,6 +21,7 @@
 
 #include "StiefelScheiffele.h"
 #include "VanDerPol.h"
+#include "EllipticOrbit.h"
 
 #include "RK4.h"
 #include "RK8.h"
@@ -96,6 +97,50 @@ int main(void)
 
     return 0;
 }
+
+
+
+int main_elliptic(void)
+{
+    // initialize DACE for 5th-order computations in 6 variables
+    DA::init(3, 6);
+
+    double rp  = 1;
+    double ecc = 0.5;
+    double t0  = 0.;
+    double tf;
+    double h   = 1e-2;
+    double tol = 1e-6;
+
+    AlgebraicVector<double> x0(4);
+    AlgebraicVector<double> x(4);
+    vector<AlgebraicVector<double>> resx;
+
+    Elliptic_IC (rp, ecc, x0, tf);
+
+    // Print Cartesian state vector at start of integration
+    cout << endl;
+    cout << " Initial Values:" << endl;
+    cout << " x:  " << std::setprecision(16) << x0[0] << endl;
+    cout << " y:  " << std::setprecision(16) << x0[1] << endl;
+    cout << " vx: " << std::setprecision(16) << x0[2] << endl;
+    cout << " vy: " << std::setprecision(16) << x0[3] << endl;
+    cout << endl;
+
+    // Perform integration
+    x = Adams<double, 8, 1>(t0, tf, h, tol, x0, Elliptic_ODE<double>, resx, false);
+
+    // Print Cartesian state vector at end of integration
+    cout << " Final Values:" << endl;
+    cout << " x:  " << std::setprecision(16) << x[0] << endl;
+    cout << " y:  " << std::setprecision(16) << x[1] << endl;
+    cout << " vx: " << std::setprecision(16) << x[2] << endl;
+    cout << " vy: " << std::setprecision(16) << x[3] << endl;
+    cout << endl;
+
+    return 0;
+}
+
 
 
 int main_not_so_much(void)
