@@ -1,3 +1,6 @@
+#ifndef __LEAPFROG_h__
+#define __LEAPFROG_h__
+
 #include <dace/dace.h>
 using namespace std;
 using namespace DACE;
@@ -42,3 +45,4 @@ AlgebraicVector<T> Leapfrog(double t0, double t1, double h, double tol, Algebrai
 
     return X;
 };
+#endif

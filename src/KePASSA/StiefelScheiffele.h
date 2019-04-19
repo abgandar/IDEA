@@ -1,8 +1,25 @@
+#ifndef __StiefelScheiffele_h__
+#define __StiefelScheiffele_h__
+
 #include <dace/dace.h>
 using namespace std;
 using namespace DACE;
 
 unsigned int funcs = 0;
+
+// initial conditions
+namespace SS {
+    // km, km/s
+    AlgebraicVector<double> x0 = { 0.000000, -5888.972700, -3400.00000, 10.691338, 0.000000, 0.000000 };
+    const double epsR = 1e-3, epsV = 1e-4;
+    double t0 = 0.;
+    //double tf = 288.12768941 * 24. * 3600.;
+    //double tf = 288.12768941 * 24. * 3600. / 100;   // Shortened version
+    double tf = 288.12768941 * 24. * 3600. / 50;   // Less shortened version
+    //AlgebraicVector<double> Ref_Sol ({-24219.05011593605201960070788, 227962.10637302200887202306088, 129753.44240008247047344318589});
+    //AlgebraicVector<double> Ref_Sol ({-0.006472054691587e5, 2.290183472899976e5, 1.322860577190283e5});     // Shortened version
+    AlgebraicVector<double> Ref_Sol ({-672.68534351214767, -6099.8133178135287, -3522.5764770819265});     // Less shortened version (only computed with tol=1e-13)
+}
 
 template <class T>
 AlgebraicVector<T> StiefelScheiffele(AlgebraicVector<T> x, double t)
@@ -64,3 +81,4 @@ AlgebraicVector<T> StiefelScheiffele(AlgebraicVector<T> x, double t)
 
     return deriv;
 }
+#endif

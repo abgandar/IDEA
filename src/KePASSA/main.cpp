@@ -32,34 +32,55 @@
 #include "BulirschStoer.h"
 #include "EverhartRadau.h"
 
+#include "test_expansion.h"
+
 using namespace std;
 using namespace DACE;
 
 int main(void)
 {
     // initialize DACE for 5th-order computations in 6 variables
-    DA::init(3, 6);
+    DA::init(6, 6);
+    DA::setEps(0.0);  // required since we don't use scaled units
 
-    // Initial conditions (km, km/s)
-    AlgebraicVector<double> x0 = { 0.000000, -5888.972700, -3400.00000, 10.691338, 0.000000, 0.000000 };
-    const double eps = 1e-1;
-    AlgebraicVector<DA> y0 = x0 + eps * AlgebraicVector<DA>::identity(6);
+    cout.precision(16);
+    cout.setf( ios::fixed, ios::floatfield );
 
-    double h = 10.;
-    double tol = 1e-8;
-    double t0 = 0.;
-    //double tf = 288.12768941 * 24. * 3600.;
-    double tf = 288.12768941 * 24. * 3600. / 100;   // Shortened version
+    // Initial conditions (km, km/s), copied from the problem (StiefelScheiffele)
+    AlgebraicVector<double> x0 = SS::x0;
+    const double epsR = SS::epsR, epsV = SS::epsV;
+    double t0 = SS::t0;
+    double tf = SS::tf;
+    AlgebraicVector<double> Ref_Sol = SS::Ref_Sol;
+
+    // local settings, derived quantities
+    //#define INTEGRATOR Leapfrog
+    //#define INTEGRATOR RK4
+    //#define INTEGRATOR Midpoint
+    //#define INTEGRATOR Adams
+    //#define INTEGRATOR BulirschStoer
+    //#define INTEGRATOR RK8
+    #define INTEGRATOR EverhartRadau
+    double h = 100.;
+    double tol = 1e-13;
+    AlgebraicVector<DA> y0(6);
+    y0[0] = x0[0] + epsR*DA(1);
+    y0[1] = x0[1] + epsR*DA(2);
+    y0[2] = x0[2] + epsR*DA(3);
+    y0[3] = x0[3] + epsV*DA(4);
+    y0[4] = x0[4] + epsV*DA(5);
+    y0[5] = x0[5] + epsV*DA(6);
 
     // Perform propagations
     AlgebraicVector<double> x(6);
     vector<AlgebraicVector<double>> resx;
 
     cout << endl << "Propagating with 'double'..." << endl;
+    funcs = 0;
     //x = EverhartRadauVar(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
     //x = BulirschStoer<double, 2>(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
-    //x = RK8(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
-    x = Adams<double, 8, 1>(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    //x = Adams<double, 8, 1>(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
+    x = INTEGRATOR(t0, tf, h, tol, x0, StiefelScheiffele<double>, resx, false);
     cout << "  Done!" << endl;
 
     AlgebraicVector<DA> y(6);
@@ -68,10 +89,6 @@ int main(void)
 //    cout << endl << "Propagating with 'DA'..." << endl;
 //    y = Leapfrog(t0, tf, h, tol, y0, StiefelScheiffele<DA>, resy, false);
 //    cout << "  Done!" << endl;
-
-    // Reference Position
-    //AlgebraicVector<double> Ref_Sol ({-24219.05011593605201960070788, 227962.10637302200887202306088, 129753.44240008247047344318589});
-    AlgebraicVector<double> Ref_Sol ({-0.006472054691587e5, 2.290183472899976e5, 1.322860577190283e5});     // Shortened version
 
     // Print Cartesian state vector at end of integration
     cout << endl;
@@ -94,6 +111,9 @@ int main(void)
     cout << " vy: " << y[4] << endl;
     cout << " vz: " << y[5] << endl;
     cout << endl;*/
+
+    // test DA expansion
+    test_expansion(INTEGRATOR, y0, t0, tf, h, tol, 10065);
 
     return 0;
 }

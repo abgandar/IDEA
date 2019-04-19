@@ -1,8 +1,11 @@
+#ifndef __ADAMS_h__
+#define __ADAMS_h__
+
 #include <dace/dace.h>
 using namespace std;
 using namespace DACE;
 
-template <class T, unsigned int ORDER, unsigned int ITERS>
+template <class T, unsigned int ORDER = 8, unsigned int ITERS = 1>
 /*  ORDER: Order of the Adams method. Coincides with # of steps for Adams-Bashforth, or # of steps + 1 for Adams-Moulton.
     ITERS: Number of 'corrector' iterations to be used, i.e.
             - If 0, the method reduces to an explicit Adams-Bashforth method.
@@ -154,3 +157,4 @@ AlgebraicVector<T> Adams(double t0, double t1, double h, double tol, AlgebraicVe
 
     return X;
 };
+#endif

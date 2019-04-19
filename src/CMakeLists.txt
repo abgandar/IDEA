@@ -25,3 +25,6 @@ include_directories ("KePASSA/Perturbations")
 
 add_executable (KePASSA KePASSA/main.cpp)
 target_link_libraries(KePASSA PUBLIC dace::dace)
+
+add_executable (points KePASSA/points.cpp)
+target_link_libraries(points PUBLIC dace::dace)

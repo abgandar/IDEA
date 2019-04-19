@@ -1,3 +1,6 @@
+#ifndef __RK78_h__
+#define __RK78_h__
+
 #include <dace/dace.h>
 using namespace std;
 using namespace DACE;
@@ -86,3 +89,4 @@ AlgebraicVector<T> RK78(double t0, double t1, double h, double tol, AlgebraicVec
 
     return Xk;
 };
+#endif

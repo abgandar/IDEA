@@ -1,3 +1,6 @@
+#ifndef __EverhartRadau_h__
+#define __EverhartRadau_h__
+
 #include <dace/dace.h>
 using namespace std;
 using namespace DACE;
@@ -141,7 +144,7 @@ AlgebraicVector<T> EverhartRadau(double t0, double t1, double hh, double tol, Al
         F[0] = RHS(X, t);
         double db = 1.0;
         unsigned int n = 0;
-        for( n = 0; n < (steps < 3 ? 20 : 20) && db > 1e-14; n++ )
+        for( n = 0; n < (steps < 3 ? 20 : 20) && (db > 1e-14); n++ )
         {
             // predictor
             for( unsigned int i = 1; i < NH; i++ )
@@ -156,7 +159,7 @@ AlgebraicVector<T> EverhartRadau(double t0, double t1, double hh, double tol, Al
             B[0] = c[0][0]*G[0] + c[1][0]*G[1] + c[2][0]*G[2] + c[3][0]*G[3];
             B[1] =                c[1][1]*G[1] + c[2][1]*G[2] + c[3][1]*G[3];
             B[2] =                               c[2][2]*G[2] + c[3][2]*G[3];
-            db = vnorm(B[3]-c[3][3]*G[3])/vnorm(F[0]);
+            db = vnorm(cons(B[3]-c[3][3]*G[3]))/vnorm(cons(F[0]));
             B[3] =                                              c[3][3]*G[3];
         }
         X += dt*(F[0] + B[0]/2.0 + B[1]/3.0 + B[2]/4.0 + B[3]/5.0);
@@ -179,3 +182,4 @@ AlgebraicVector<T> EverhartRadau(double t0, double t1, double hh, double tol, Al
 
     return X;
 };
+#endif

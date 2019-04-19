@@ -1,3 +1,6 @@
+#ifndef __RK8_h__
+#define __RK8_h__
+
 #include <dace/dace.h>
 using namespace std;
 using namespace DACE;
@@ -66,3 +69,4 @@ AlgebraicVector<T> RK8(double t0, double t1, double h, double tol, AlgebraicVect
 
     return Xk;
 };
+#endif
