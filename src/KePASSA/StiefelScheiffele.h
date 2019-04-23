@@ -11,7 +11,8 @@ unsigned int funcs = 0;
 namespace SS {
     // km, km/s
     AlgebraicVector<double> x0 = { 0.000000, -5888.972700, -3400.00000, 10.691338, 0.000000, 0.000000 };
-    const double epsR = 1e-3, epsV = 1e-4;
+    const double epsR = 1e-3, epsV = 1e-5;      // WARNING: changing this requires editing run.sh and regenerating reference solution!
+    //const double epsR = 10000., epsV = 10000.;
     double t0 = 0.;
     //double tf = 288.12768941 * 24. * 3600.;
     //double tf = 288.12768941 * 24. * 3600. / 100;   // Shortened version
@@ -22,7 +23,7 @@ namespace SS {
 }
 
 template <class T>
-AlgebraicVector<T> StiefelScheiffele(AlgebraicVector<T> x, double t)
+AlgebraicVector<T> StiefelScheiffele(const AlgebraicVector<T> x, double t)
 {
     funcs++;
     AlgebraicVector<T> deriv(6);

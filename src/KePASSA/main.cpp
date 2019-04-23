@@ -37,15 +37,19 @@
 using namespace std;
 using namespace DACE;
 
-int main(void)
+#define STR(x) STRSTR(x)
+#define STRSTR(x) string(#x)
+
+//#define INTEGRATOR Leapfrog
+#define INTEGRATOR RK4
+//#define INTEGRATOR Midpoint
+//#define INTEGRATOR Adams
+//#define INTEGRATOR BulirschStoer
+//#define INTEGRATOR RK8
+//#define INTEGRATOR EverhartRadau
+
+void test_stepsize(const double href = 1.0)
 {
-    // initialize DACE for 5th-order computations in 6 variables
-    DA::init(6, 6);
-    DA::setEps(0.0);  // required since we don't use scaled units
-
-    cout.precision(16);
-    cout.setf( ios::fixed, ios::floatfield );
-
     // Initial conditions (km, km/s), copied from the problem (StiefelScheiffele)
     AlgebraicVector<double> x0 = SS::x0;
     const double epsR = SS::epsR, epsV = SS::epsV;
@@ -54,14 +58,62 @@ int main(void)
     AlgebraicVector<double> Ref_Sol = SS::Ref_Sol;
 
     // local settings, derived quantities
-    //#define INTEGRATOR Leapfrog
-    //#define INTEGRATOR RK4
-    //#define INTEGRATOR Midpoint
-    //#define INTEGRATOR Adams
-    //#define INTEGRATOR BulirschStoer
-    //#define INTEGRATOR RK8
-    #define INTEGRATOR EverhartRadau
-    double h = 100.;
+    double tol = 1e-13;
+    ofstream os(STR(INTEGRATOR)+"/stepsize.data");
+    int i = 1;
+    for( double h = href; h < 7*href; h *= 1.2, i++ )
+    {
+      AlgebraicVector<DA> y0(6);
+      y0[0] = x0[0] + epsR*DA(1);
+      y0[1] = x0[1] + epsR*DA(2);
+      y0[2] = x0[2] + epsR*DA(3);
+      y0[3] = x0[3] + epsV*DA(4);
+      y0[4] = x0[4] + epsV*DA(5);
+      y0[5] = x0[5] + epsV*DA(6);
+
+      AlgebraicVector<DA> y(6);
+      vector<AlgebraicVector<DA>> resy;
+
+      // test DA expansion
+      double det0 = test_expansion(INTEGRATOR, y0, t0, tf, h, tol, 10065, os, STR(INTEGRATOR)+string("/")+to_string(i) + string("-"));
+    }
+}
+
+int test_double(double h);
+
+int main(void)
+{
+    // initialize DACE for 5th-order computations in 6 variables
+    DA::init(6, 6);
+    DA::setEps(0.0);  // required since we don't use scaled units
+
+    cout.precision(16);
+    cout.setf( ios::scientific, ios::floatfield );
+    test_stepsize(0.1);
+    //test_double(15.6);
+}    
+
+// Integrator     href                              O6
+// Adams 8,1      13                                X
+// RK8            135                               X
+// RK4            2.5                               X
+// ER8            125                               X
+// BS8            630                               X
+// MP2            < 1   (still 9.8 m for 0.01)
+// LF2            < 1   (still 7.8 m for 0.01)      X
+
+
+
+int test_double(const double h)
+{
+    // Initial conditions (km, km/s), copied from the problem (StiefelScheiffele)
+    AlgebraicVector<double> x0 = SS::x0;
+    const double epsR = SS::epsR, epsV = SS::epsV;
+    double t0 = SS::t0;
+    double tf = SS::tf;
+    AlgebraicVector<double> Ref_Sol = SS::Ref_Sol;
+
+    // local settings, derived quantities
     double tol = 1e-13;
     AlgebraicVector<DA> y0(6);
     y0[0] = x0[0] + epsR*DA(1);
@@ -113,7 +165,7 @@ int main(void)
     cout << endl;*/
 
     // test DA expansion
-    test_expansion(INTEGRATOR, y0, t0, tf, h, tol, 10065);
+    //test_expansion(INTEGRATOR, y0, t0, tf, h, tol, 10065);
 
     return 0;
 }

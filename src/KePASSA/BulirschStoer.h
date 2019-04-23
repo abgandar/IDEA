@@ -7,7 +7,7 @@
 using namespace std;
 using namespace DACE;
 
-template <class T, unsigned int ORDER = 4>
+template <class T, unsigned int ORDER = 8>
 AlgebraicVector<T> BulirschStoer(double t0, double t1, double h, double tol, AlgebraicVector<T> x0, AlgebraicVector<T> (*RHS)(AlgebraicVector<T>, double), vector<AlgebraicVector<T>> &res, bool save)
 {
     AlgebraicVector<T> eta[ORDER][ORDER], X = x0;

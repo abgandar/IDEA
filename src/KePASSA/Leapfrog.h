@@ -13,7 +13,7 @@ AlgebraicVector<T> Leapfrog(double t0, double t1, double h, double tol, Algebrai
     double t = t0;
 
     if( save )
-        res.push_back( xi );
+        res.push_back( x0 );
 
     xi = X.extract(0, 2);
     vi = X.extract(3, 5);
@@ -42,7 +42,6 @@ AlgebraicVector<T> Leapfrog(double t0, double t1, double h, double tol, Algebrai
         const double progress = 100.00 * (t) / (t1-t0);
         if( steps % 5000 == 0) std::cout << "  Steps: " << steps << "\t" << progress << " \%" << std::endl;
     }
-
     return X;
 };
 #endif

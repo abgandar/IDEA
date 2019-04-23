@@ -6,7 +6,7 @@
 
 # feed points to Hodei's program for reference solutions
 epsR=0.001        # in km, as in C++ code
-epsV=0.0001
+epsV=0.00001
 scaleX=`bc -l <<< "$epsR * 1000"`   # convert to m
 scaleV=`bc -l <<< "$epsV * 1000"`
 echo > reference.dat
